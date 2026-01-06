@@ -106,17 +106,26 @@
     <tbody id="tableBody"></tbody>
   </table>
 
-  <div class="meta">
-    <strong>Teaching notes:</strong>
-    <ul>
-      <li><em>Social / Exact</em> shows platform‑standard dimensions (e.g. 1080×1920).</li>
-      <li><em>Model‑Safe</em> rounds dimensions to the nearest multiple of 8/16/32 to avoid diffusion artifacts.</li>
-      <li>For large outputs (2K–4K), generate at model‑native size and upscale.</li>
-    </ul>
-  </div>
-
   <script>
     const DATA = {
+      "Typical_512_Base": {
+        "1:1": [512, 512],
+        "16:9": [768, 432],
+        "9:16": [432, 768],
+        "4:3": [640, 480]
+      },
+      "Typical_1024_Base": {
+        "1:1": [1024, 1024],
+        "16:9": [1920, 1080],
+        "9:16": [1080, 1920],
+        "4:3": [1365, 1024]
+      },
+      "4K_Targets": {
+        "16:9 (UHD)": [3840, 2160],
+        "9:16 (Vertical)": [2160, 3840],
+        "1:1": [4096, 4096],
+        "21:9": [4096, 1744]
+      },
       "Qwen_Image_2512": {
         "1:1": [1328, 1328],
         "16:9": [1664, 928],
@@ -166,24 +175,6 @@
         "9:16 (Story/Reel/TikTok)": [1080, 1920],
         "16:9 (YouTube/Facebook)": [1920, 1080],
         "1.91:1 (LinkedIn)": [1200, 627]
-      },
-      "Typical_512_Base": {
-        "1:1": [512, 512],
-        "16:9": [768, 432],
-        "9:16": [432, 768],
-        "4:3": [640, 480]
-      },
-      "Typical_1024_Base": {
-        "1:1": [1024, 1024],
-        "16:9": [1920, 1080],
-        "9:16": [1080, 1920],
-        "4:3": [1365, 1024]
-      },
-      "4K_Targets": {
-        "16:9 (UHD)": [3840, 2160],
-        "9:16 (Vertical)": [2160, 3840],
-        "1:1": [4096, 4096],
-        "21:9": [4096, 1744]
       }
     };
 
