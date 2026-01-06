@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Image Generation Resolution Reference</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 1.5rem;
+      background: #f7f7f9;
+      color: #111;
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      color: #444;
+      max-width: 900px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      align-items: center;
+    }
+    select, button {
+      padding: 0.45rem 0.7rem;
+      font-size: 0.9rem;
+    }
+    label {
+      font-size: 0.9rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    th, td {
+      padding: 0.55rem 0.7rem;
+      border-bottom: 1px solid #e5e5e5;
+      text-align: left;
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+    th {
+      background: #f0f0f3;
+      font-weight: 600;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    .copy-btn {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.45rem;
+      cursor: pointer;
+    }
+    .meta {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: #555;
+      max-width: 900px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>AI Image Generation – Resolution & Aspect Ratio Reference</h1>
+  <p>
+    Single‑page reference for commonly used aspect ratios and pixel dimensions across major AI image models
+    (Stable Diffusion variants, SDXL, Flux, Qwen) and social/display formats. Designed for teaching, studio use,
+    and fast decision‑making in ComfyUI workflows.
+  </p>
+
+  <div class="controls">
+    <label>
+      Model / Category:
+      <select id="modelSelect"></select>
+    </label>
+
+    <label>
+      Resolution Mode:
+      <select id="modeSelect">
+        <option value="exact">Social / Exact</option>
+        <option value="safe">Model‑Safe (Divisible)</option>
+      </select>
+    </label>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Aspect Ratio</th>
+        <th>Width (px)</th>
+        <th>Height (px)</th>
+        <th>Megapixels</th>
+        <th>Copy</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <div class="meta">
+    <strong>Teaching notes:</strong>
+    <ul>
+      <li><em>Social / Exact</em> shows platform‑standard dimensions (e.g. 1080×1920).</li>
+      <li><em>Model‑Safe</em> rounds dimensions to the nearest multiple of 8/16/32 to avoid diffusion artifacts.</li>
+      <li>For large outputs (2K–4K), generate at model‑native size and upscale.</li>
+    </ul>
+  </div>
+
+  <script>
+    const DATA = {
+      "Qwen_Image_2512": {
+        "1:1": [1328, 1328],
+        "16:9": [1664, 928],
+        "9:16": [928, 1664],
+        "4:3": [1472, 1104],
+        "3:4": [1104, 1472],
+        "3:2": [1584, 1056],
+        "2:3": [1056, 1584]
+      },
+      "Stable_Diffusion_1.5": {
+        "1:1": [512, 512],
+        "3:2": [768, 512],
+        "2:3": [512, 768],
+        "4:3": [768, 576],
+        "3:4": [576, 768],
+        "16:9": [912, 512],
+        "9:16": [512, 912]
+      },
+      "Stable_Diffusion_2.1": {
+        "1:1": [768, 768],
+        "3:2": [1152, 768],
+        "2:3": [768, 1152],
+        "4:3": [1024, 768],
+        "3:4": [768, 1024],
+        "16:9": [1152, 648],
+        "9:16": [648, 1152]
+      },
+      "SDXL": {
+        "1:1": [1024, 1024],
+        "3:2": [1216, 832],
+        "2:3": [832, 1216],
+        "4:3": [1152, 864],
+        "3:4": [864, 1152],
+        "16:9": [1280, 720],
+        "9:16": [720, 1280]
+      },
+      "Flux": {
+        "1:1": [1024, 1024],
+        "16:9": [1920, 1080],
+        "9:16": [1080, 1920],
+        "21:9": [2560, 1080],
+        "32:9": [2560, 720]
+      },
+      "Social_Media": {
+        "1:1 (Square)": [1080, 1080],
+        "4:5 (Instagram Post)": [1080, 1350],
+        "9:16 (Story/Reel/TikTok)": [1080, 1920],
+        "16:9 (YouTube/Facebook)": [1920, 1080],
+        "1.91:1 (LinkedIn)": [1200, 627]
+      },
+      "Typical_512_Base": {
+        "1:1": [512, 512],
+        "16:9": [768, 432],
+        "9:16": [432, 768],
+        "4:3": [640, 480]
+      },
+      "Typical_1024_Base": {
+        "1:1": [1024, 1024],
+        "16:9": [1920, 1080],
+        "9:16": [1080, 1920],
+        "4:3": [1365, 1024]
+      },
+      "4K_Targets": {
+        "16:9 (UHD)": [3840, 2160],
+        "9:16 (Vertical)": [2160, 3840],
+        "1:1": [4096, 4096],
+        "21:9": [4096, 1744]
+      }
+    };
+
+    const modelSelect = document.getElementById("modelSelect");
+    const modeSelect = document.getElementById("modeSelect");
+    const tableBody = document.getElementById("tableBody");
+
+    function roundSafe(value) {
+      return Math.round(value / 32) * 32;
+    }
+
+    function megapixels(w, h) {
+      return ((w * h) / 1_000_000).toFixed(2);
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text);
+    }
+
+    function populateModels() {
+      Object.keys(DATA).forEach(key => {
+        const opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = key.replace(/_/g, " ");
+        modelSelect.appendChild(opt);
+      });
+    }
+
+    function renderTable() {
+      const modelKey = modelSelect.value;
+      const mode = modeSelect.value;
+      tableBody.innerHTML = "";
+
+      Object.entries(DATA[modelKey]).forEach(([ratio, dims]) => {
+        let [w, h] = dims;
+        if (mode === "safe") {
+          w = roundSafe(w);
+          h = roundSafe(h);
+        }
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${ratio}</td>
+          <td>${w}</td>
+          <td>${h}</td>
+          <td>${megapixels(w, h)}</td>
+          <td><button class="copy-btn" onclick="copyText('${w}x${h}')">Copy</button></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    modelSelect.addEventListener("change", renderTable);
+    modeSelect.addEventListener("change", renderTable);
+
+    populateModels();
+    modelSelect.value = Object.keys(DATA)[0];
+    renderTable();
+  </script>
+
+</body>
+</html>
